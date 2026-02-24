@@ -1,0 +1,57 @@
+package config
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"reflect"
+	"strings"
+)
+
+func loadEnvFile(filename string) error {
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+
+		value = strings.Trim(value, `"'`)
+
+		if os.Getenv(key) == "" {
+			os.Setenv(key, value)
+		}
+	}
+
+	return scanner.Err()
+}
+
+func loadFromEnv(cfg interface{}) error {
+	v := reflect.ValueOf(cfg)
+
+	if v.Kind() != reflect.Ptr {
+		return fmt.Errorf("config must be a pointer")
+	}
+
+	v = v.Elem()
+	if v.Kind() != reflect.Struct {
+		return fmt.Errorf("config must be a struct")
+	}
+
+	return processStruct(v)
+}
