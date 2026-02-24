@@ -1,0 +1,33 @@
+services:
+
+  # Bot стартует первым — генерирует RCON-пароль и пишет его в rconpw
+  # до того как factorio-сервер его прочитает при запуске.
+  bot:
+    build: .
+    container_name: factorio-bot
+    volumes:
+      - ./internal/factorio:/factorio                # данные сервера прямо из репо
+      - /var/run/docker.sock:/var/run/docker.sock    # нужно для /stop и /startServer
+    env_file: .env
+    environment:
+      RCON_HOST: factorio
+      RCON_PORT: "27015"
+      FACTORIO_GAME_HOST: factorio
+      FACTORIO_GAME_PORT: "34197"
+      FACTORIO_SAVES_DIR: /factorio/saves
+      FACTORIO_RCON_PW_FILE: /factorio/config/rconpw
+      FACTORIO_SERVER_SETTINGS_FILE: /factorio/config/server-settings.json
+      DOCKER_CONTAINER_NAME: factorio
+    restart: unless-stopped
+
+  factorio:
+    image: factoriotools/factorio:2.0.73
+    container_name: factorio
+    ports:
+      - "34197:34197/udp"   # игровой порт для подключения игроков
+    volumes:
+      - ./internal/factorio:/factorio                # те же данные — моды, сейвы, конфиг
+    restart: unless-stopped
+    stop_grace_period: 60s
+    depends_on:
+      - bot   # factorio стартует после bot, чтобы rconpw уже был записан
