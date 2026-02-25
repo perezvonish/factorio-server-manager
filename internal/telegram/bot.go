@@ -75,8 +75,11 @@ func (b *Bot) isAllowedUser(userID int64) bool {
 	return ok
 }
 
-func (b *Bot) reply(chatID int64, text string) {
+func (b *Bot) reply(chatID int64, text string, parseMode ...string) {
 	msg := tgbotapi.NewMessage(chatID, text)
+	if len(parseMode) > 0 {
+		msg.ParseMode = parseMode[0]
+	}
 	if _, err := b.api.Send(msg); err != nil {
 		log.Printf("reply error: %v", err)
 	}
