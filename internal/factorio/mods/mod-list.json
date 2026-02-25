@@ -1,0 +1,232 @@
+{
+  "mods": [
+    {
+      "name": "base",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "enabled": true
+    },
+    {
+      "name": "alien-biomes-graphics",
+      "enabled": true
+    },
+    {
+      "name": "AutoDeconstruct",
+      "enabled": true
+    },
+    {
+      "name": "Better_Starmap_Background",
+      "enabled": true
+    },
+    {
+      "name": "bplib",
+      "enabled": true
+    },
+    {
+      "name": "bullet-trails",
+      "enabled": true
+    },
+    {
+      "name": "Cerys-Moon-of-Fulgora",
+      "enabled": true
+    },
+    {
+      "name": "colorful_biochamber",
+      "enabled": true
+    },
+    {
+      "name": "enhanced-shadows",
+      "enabled": true
+    },
+    {
+      "name": "EpicArtillerySounds",
+      "enabled": true
+    },
+    {
+      "name": "factorissimo-2-notnotmelon",
+      "enabled": true
+    },
+    {
+      "name": "Flare Stack",
+      "enabled": true
+    },
+    {
+      "name": "flib",
+      "enabled": true
+    },
+    {
+      "name": "FluidMustFlow",
+      "enabled": true
+    },
+    {
+      "name": "folk-fill",
+      "enabled": true
+    },
+    {
+      "name": "FusionPoweredRobots",
+      "enabled": true
+    },
+    {
+      "name": "helmod",
+      "enabled": true
+    },
+    {
+      "name": "inventory-repair",
+      "enabled": true
+    },
+    {
+      "name": "long_stack_inserter",
+      "enabled": true
+    },
+    {
+      "name": "machine-upgrades",
+      "enabled": true
+    },
+    {
+      "name": "maraxsis",
+      "enabled": true
+    },
+    {
+      "name": "Milestones",
+      "enabled": true
+    },
+    {
+      "name": "minimalist-rails",
+      "enabled": true
+    },
+    {
+      "name": "Moshine",
+      "enabled": true
+    },
+    {
+      "name": "Moshine-assets",
+      "enabled": true
+    },
+    {
+      "name": "muluna-graphics",
+      "enabled": true
+    },
+    {
+      "name": "muluna-utility-constants",
+      "enabled": true
+    },
+    {
+      "name": "planet-muluna",
+      "enabled": true
+    },
+    {
+      "name": "PlanetsLib",
+      "enabled": true
+    },
+    {
+      "name": "play_time_display",
+      "enabled": true
+    },
+    {
+      "name": "Power Armor MK3",
+      "enabled": true
+    },
+    {
+      "name": "RateCalculator",
+      "enabled": true
+    },
+    {
+      "name": "repair-from-vehicle",
+      "enabled": true
+    },
+    {
+      "name": "RocketCargoInsertion",
+      "enabled": true
+    },
+    {
+      "name": "rubia",
+      "enabled": true
+    },
+    {
+      "name": "rubia-assets",
+      "enabled": true
+    },
+    {
+      "name": "SchallEndgameEvolution",
+      "enabled": true
+    },
+    {
+      "name": "se-space-trains",
+      "enabled": true
+    },
+    {
+      "name": "secretas",
+      "enabled": true
+    },
+    {
+      "name": "skewer_planet_vesta",
+      "enabled": true
+    },
+    {
+      "name": "skewer_planet_vesta_assets",
+      "enabled": true
+    },
+    {
+      "name": "skewer_planet_vesta_assets_2",
+      "enabled": true
+    },
+    {
+      "name": "snouz-big-accumulator",
+      "enabled": true
+    },
+    {
+      "name": "snouz-big-solar-panel",
+      "enabled": true
+    },
+    {
+      "name": "snouz_better_substation",
+      "enabled": true
+    },
+    {
+      "name": "some-squeak-through",
+      "enabled": true
+    },
+    {
+      "name": "space-exploration-graphics",
+      "enabled": true
+    },
+    {
+      "name": "space-exploration-graphics-4",
+      "enabled": true
+    },
+    {
+      "name": "SpidertronEnhancements",
+      "enabled": true
+    },
+    {
+      "name": "SpidertronPatrols",
+      "enabled": true
+    },
+    {
+      "name": "squeak-through-2",
+      "enabled": true
+    },
+    {
+      "name": "tile-upgrade-planner-muluna",
+      "enabled": true
+    },
+    {
+      "name": "visible-planets",
+      "enabled": true
+    },
+    {
+      "name": "water-pumpjack",
+      "enabled": true
+    }
+  ]
+}
