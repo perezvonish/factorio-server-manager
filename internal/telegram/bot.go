@@ -6,6 +6,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
 	"perezvonish/factorio-server-manager/internal/domain"
+	"perezvonish/factorio-server-manager/internal/factorio/mods"
 	"perezvonish/factorio-server-manager/internal/factorio/saves"
 	"perezvonish/factorio-server-manager/internal/factorio/status"
 	"perezvonish/factorio-server-manager/internal/password"
@@ -20,6 +21,7 @@ type Bot struct {
 	saves        *saves.Manager
 	status       *status.Checker
 	passwords    *password.Manager
+	mods         *mods.Manager
 }
 
 // Config holds all dependencies needed to build a Bot
@@ -31,6 +33,7 @@ type Config struct {
 	Saves        *saves.Manager
 	Status       *status.Checker
 	PasswordMgr  *password.Manager
+	Mods         *mods.Manager
 }
 
 func NewBot(cfg Config) (*Bot, error) {
@@ -47,6 +50,7 @@ func NewBot(cfg Config) (*Bot, error) {
 		saves:        cfg.Saves,
 		status:       cfg.Status,
 		passwords:    cfg.PasswordMgr,
+		mods:         cfg.Mods,
 	}, nil
 }
 

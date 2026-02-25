@@ -7,6 +7,7 @@ import (
 
 	"perezvonish/factorio-server-manager/internal/config"
 	"perezvonish/factorio-server-manager/internal/docker"
+	"perezvonish/factorio-server-manager/internal/factorio/mods"
 	rconClient "perezvonish/factorio-server-manager/internal/factorio/rcon"
 	"perezvonish/factorio-server-manager/internal/factorio/saves"
 	"perezvonish/factorio-server-manager/internal/factorio/settings"
@@ -41,6 +42,13 @@ func main() {
 	dockerMgr := docker.NewManager(cfg.Docker.ContainerName)
 	saveMgr := saves.NewManager(cfg.FactorioServer.SavesDir)
 	statusChecker := status.NewChecker(cfg.FactorioServer.GameHost, cfg.FactorioServer.GamePort)
+	modsMgr := mods.NewManager(
+		cfg.ModPortal.ModsDir,
+		cfg.ModPortal.ModListFile,
+		cfg.ModPortal.Username,
+		cfg.ModPortal.Token,
+		cfg.ModPortal.FactorioVersion,
+	)
 
 	bot, err := telegram.NewBot(telegram.Config{
 		Token:        cfg.Telegram.BotToken,
@@ -50,6 +58,7 @@ func main() {
 		Saves:        saveMgr,
 		Status:       statusChecker,
 		PasswordMgr:  pwManager,
+		Mods:         modsMgr,
 	})
 	if err != nil {
 		log.Fatalf("telegram bot: %v", err)

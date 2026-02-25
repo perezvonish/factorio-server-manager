@@ -18,6 +18,9 @@ services:
       FACTORIO_RCON_PW_FILE: /factorio/config/rconpw
       FACTORIO_SERVER_SETTINGS_FILE: /factorio/config/server-settings.json
       DOCKER_CONTAINER_NAME: factorio
+      FACTORIO_MODS_DIR: /factorio/mods
+      FACTORIO_MOD_LIST_FILE: /factorio/mods/mod-list.json
+      FACTORIO_VERSION: "2.0"
     restart: unless-stopped
 
   factorio:

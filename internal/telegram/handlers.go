@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -190,13 +189,23 @@ func (b *Bot) handleEvolution(chatID int64) {
 	b.reply(chatID, "🦠 "+resp)
 }
 
-// ── restart (RCON /quit, Docker auto-restart) ─────────────────────────────────
+// ── restart (stop → sync mods → start) ───────────────────────────────────────
 
 func (b *Bot) handleRestart(chatID int64) {
 	b.reply(chatID, "🔄 Перезапускаю сервер...")
-	_, _ = b.rcon.Execute("/quit")
-	time.Sleep(3 * time.Second)
-	b.reply(chatID, "✅ Команда отправлена (Docker restart policy перезапустит контейнер)")
+
+	if err := b.container.Stop(context.Background()); err != nil {
+		b.reply(chatID, "❌ Не удалось остановить контейнер: "+err.Error())
+		return
+	}
+
+	b.syncModsWithReply(chatID)
+
+	if err := b.container.Start(context.Background()); err != nil {
+		b.reply(chatID, "❌ Не удалось запустить контейнер: "+err.Error())
+		return
+	}
+	b.reply(chatID, "✅ Сервер перезапущен")
 }
 
 // ── stop container ────────────────────────────────────────────────────────────
@@ -213,12 +222,31 @@ func (b *Bot) handleStopServer(chatID int64) {
 // ── start container ───────────────────────────────────────────────────────────
 
 func (b *Bot) handleStartServer(chatID int64) {
+	b.syncModsWithReply(chatID)
+
 	b.reply(chatID, "▶️ Запускаю контейнер...")
 	if err := b.container.Start(context.Background()); err != nil {
 		b.reply(chatID, "❌ "+err.Error())
 		return
 	}
 	b.reply(chatID, "✅ Контейнер запущен")
+}
+
+// syncModsWithReply runs SyncMods and sends a status reply to the user.
+func (b *Bot) syncModsWithReply(chatID int64) {
+	b.reply(chatID, "🔍 Проверяю моды...")
+
+	count, failures, err := b.mods.SyncMods(context.Background())
+	if err != nil {
+		b.reply(chatID, "❌ Ошибка синхронизации модов: "+err.Error())
+		return
+	}
+	if len(failures) > 0 {
+		b.reply(chatID, "⚠️ Не удалось скачать: "+strings.Join(failures, ", "))
+	}
+	if count > 0 {
+		b.reply(chatID, fmt.Sprintf("✅ Скачано модов: %d", count))
+	}
 }
 
 // ── getPassword ───────────────────────────────────────────────────────────────
