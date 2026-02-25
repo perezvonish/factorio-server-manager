@@ -199,6 +199,12 @@ func (b *Bot) handleRestart(chatID int64) {
 		return
 	}
 
+	// Удаляем автосейвы, чтобы сервер загрузил именно загруженную карту,
+	// а не последний _autosave*.zip, созданный пока сервер ещё работал.
+	if err := b.saves.CleanAutosaves(); err != nil {
+		log.Printf("CleanAutosaves error: %v", err)
+	}
+
 	b.syncModsWithReply(chatID)
 
 	if err := b.container.Start(context.Background()); err != nil {
@@ -222,6 +228,11 @@ func (b *Bot) handleStopServer(chatID int64) {
 // ── start container ───────────────────────────────────────────────────────────
 
 func (b *Bot) handleStartServer(chatID int64) {
+	// Удаляем автосейвы перед стартом — загружается именно загруженная карта.
+	if err := b.saves.CleanAutosaves(); err != nil {
+		log.Printf("CleanAutosaves error: %v", err)
+	}
+
 	b.syncModsWithReply(chatID)
 
 	b.reply(chatID, "▶️ Запускаю контейнер...")

@@ -2,9 +2,11 @@ package saves
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 // Manager handles reading and writing Factorio save files
@@ -55,6 +57,29 @@ func (m *Manager) LatestSave() (string, []byte, error) {
 	}
 
 	return files[0].name, data, nil
+}
+
+// CleanAutosaves removes Factorio autosave files (_autosave*.zip).
+// Call this before starting the server so the user's uploaded save is picked as the latest.
+func (m *Manager) CleanAutosaves() error {
+	entries, err := os.ReadDir(m.savesDir)
+	if err != nil {
+		return fmt.Errorf("reading saves dir: %w", err)
+	}
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		name := entry.Name()
+		if strings.HasPrefix(name, "_autosave") && strings.HasSuffix(name, ".zip") {
+			path := filepath.Join(m.savesDir, name)
+			if err := os.Remove(path); err != nil {
+				return fmt.Errorf("removing %s: %w", name, err)
+			}
+			log.Printf("saves: removed autosave %s", name)
+		}
+	}
+	return nil
 }
 
 // Replace removes all existing .zip saves and writes the new one

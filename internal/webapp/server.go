@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"sync/atomic"
 
 	"perezvonish/factorio-server-manager/internal/factorio/saves"
 )
@@ -25,6 +26,7 @@ type Server struct {
 	botToken     string
 	allowedUsers map[int64]struct{}
 	saves        *saves.Manager
+	ready        atomic.Bool // true after initial SyncMods completes
 }
 
 func NewServer(botToken string, allowedUsers map[int64]struct{}, saves *saves.Manager) *Server {
@@ -35,12 +37,29 @@ func NewServer(botToken string, allowedUsers map[int64]struct{}, saves *saves.Ma
 	}
 }
 
+// SetReady signals that startup (SyncMods) has completed.
+// After this, /health returns 200 and the Factorio container may start.
+func (s *Server) SetReady() { s.ready.Store(true) }
+
 func (s *Server) ListenAndServe(addr string) error {
 	mux := http.NewServeMux()
+	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/", s.handleIndex)
 	mux.HandleFunc("/upload", s.handleUpload)
 	log.Printf("webapp: listening on %s", addr)
 	return http.ListenAndServe(addr, mux)
+}
+
+// handleHealth is used by the Docker health check.
+// Returns 200 OK only after SetReady() has been called (i.e. SyncMods completed).
+func (s *Server) handleHealth(w http.ResponseWriter, _ *http.Request) {
+	if s.ready.Load() {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok")) //nolint:errcheck
+	} else {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		w.Write([]byte("starting")) //nolint:errcheck
+	}
 }
 
 // handleIndex serves the upload HTML page.

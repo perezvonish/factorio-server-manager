@@ -1,7 +1,7 @@
 services:
 
-  # Bot стартует первым — генерирует RCON-пароль и пишет его в rconpw
-  # до того как factorio-сервер его прочитает при запуске.
+  # Bot стартует первым — генерирует RCON-пароль, скачивает моды, потом сигналит готовность.
+  # Factorio container стартует только после того, как /health вернёт 200.
   bot:
     build: .
     container_name: factorio-bot
@@ -23,6 +23,13 @@ services:
       FACTORIO_MODS_DIR: /factorio/mods
       FACTORIO_MOD_LIST_FILE: /factorio/mods/mod-list.json
       FACTORIO_VERSION: "2.0"
+    healthcheck:
+      # /health возвращает 200 только после того, как SyncMods при старте завершился
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 600s  # до 10 минут на скачивание модов при первом запуске
     restart: unless-stopped
 
   factorio:
@@ -35,4 +42,5 @@ services:
     restart: unless-stopped
     stop_grace_period: 60s
     depends_on:
-      - bot
+      bot:
+        condition: service_healthy   # ждём пока моды скачаются

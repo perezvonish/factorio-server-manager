@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -53,13 +54,31 @@ func main() {
 		cfg.ModPortal.FactorioVersion,
 	)
 
-	// Start the save-upload WebApp HTTP server in the background.
+	// Start the WebApp HTTP server immediately so /health responds during SyncMods.
 	webAppSrv := webapp.NewServer(cfg.Telegram.BotToken, allowedUsers, saveMgr)
 	go func() {
 		if err := webAppSrv.ListenAndServe(":" + cfg.WebApp.Port); err != nil {
 			log.Fatalf("webapp server: %v", err)
 		}
 	}()
+
+	// Sync mods synchronously at startup.
+	// The Factorio container waits for /health (condition: service_healthy),
+	// which only returns 200 after SetReady() — i.e. after SyncMods finishes.
+	log.Println("mods: синхронизация при старте...")
+	count, failures, err := modsMgr.SyncMods(context.Background())
+	if err != nil {
+		log.Printf("mods: WARN ошибка при старте: %v", err)
+	} else {
+		if count > 0 {
+			log.Printf("mods: скачано при старте: %d", count)
+		}
+		if len(failures) > 0 {
+			log.Printf("mods: WARN не удалось скачать: %v", failures)
+		}
+	}
+	// Signal readiness — /health starts returning 200, Factorio container may start.
+	webAppSrv.SetReady()
 
 	bot, err := telegram.NewBot(telegram.Config{
 		Token:        cfg.Telegram.BotToken,
