@@ -1,0 +1,18 @@
+# Zip-файлы (моды и сейвы) — монтируются как volume, не нужны для сборки
+**/*.zip
+
+# Factorio runtime-данные
+internal/factorio/*.log
+internal/factorio/.lock
+internal/factorio/player-data.json
+internal/factorio/config/
+internal/factorio/temp/
+internal/factorio/mods/mod-settings.dat
+internal/factorio/mods/mod-list.json
+
+.git/
+.idea/
+*.iml
+
+.env
+bot
