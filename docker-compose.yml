@@ -5,6 +5,8 @@ services:
   bot:
     build: .
     container_name: factorio-bot
+    ports:
+      - "8080:8080"   # WebApp для загрузки сохранений
     volumes:
       - ./internal/factorio:/factorio                # данные сервера прямо из репо
       - /var/run/docker.sock:/var/run/docker.sock    # нужно для /stop и /startServer
@@ -24,13 +26,13 @@ services:
     restart: unless-stopped
 
   factorio:
-    image: factoriotools/factorio:2.0.73
+    image: factoriotools/factorio:2.0.73    # При выходе обновы на клиент игры происходит сихронный выход factoriotools. Если попытаться зайти под разными версиями - УВИ, ошибка рассинхрона
     container_name: factorio
     ports:
       - "34197:34197/udp"   # игровой порт для подключения игроков
     volumes:
-      - ./internal/factorio:/factorio                # те же данные — моды, сейвы, конфиг
+      - ./internal/factorio:/factorio
     restart: unless-stopped
     stop_grace_period: 60s
     depends_on:
-      - bot   # factorio стартует после bot, чтобы rconpw уже был записан
+      - bot

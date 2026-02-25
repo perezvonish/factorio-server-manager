@@ -4,6 +4,7 @@ type Config struct {
 	Telegram       TelegramConfig
 	FactorioServer FactorioServerConfig
 	Docker         DockerConfig
+	WebApp         WebAppConfig
 	ModPortal      ModPortalConfig
 }
 
@@ -24,6 +25,16 @@ type FactorioServerConfig struct {
 
 type DockerConfig struct {
 	ContainerName string `env:"DOCKER_CONTAINER_NAME" envDefault:"factorio"`
+}
+
+// WebAppConfig configures the built-in HTTP server for the save-upload Telegram WebApp.
+type WebAppConfig struct {
+	// Port — внутренний порт HTTP-сервера (по умолчанию 8080).
+	Port string `env:"WEBAPP_PORT" envDefault:"8080"`
+	// URL — публичный HTTPS-адрес, который открывается в Telegram WebApp.
+	// Должен быть HTTPS, например: https://example.com:8080
+	// Если не задан, /uploadSave шлёт текстовую инструкцию вместо кнопки.
+	URL string `env:"WEBAPP_URL" envDefault:""`
 }
 
 type ModPortalConfig struct {

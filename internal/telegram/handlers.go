@@ -74,7 +74,7 @@ func (b *Bot) handleUpdate(update tgbotapi.Update) {
 		b.handleGetPassword(chatID)
 
 	case "uploadSave":
-		b.reply(chatID, "📤 Отправь zip-файл сохранения в этот чат.")
+		b.handleUploadSaveCommand(chatID)
 
 	case "downloadSave":
 		b.handleDownloadSave(chatID)
@@ -93,14 +93,14 @@ func (b *Bot) handleHelp(chatID int64) {
 /save — принудительное сохранение
 /time — время в игре
 /evolution — уровень эволюции
-/restart — перезапустить через RCON (Docker restart policy)
+/restart — остановить, обновить моды, запустить
 
 /stop — полностью остановить контейнер
-/startServer — запустить контейнер
+/startServer — запустить контейнер (с обновлением модов)
 
 /getPassword — пароль RCON подключения
 /downloadSave — скачать текущее сохранение
-/uploadSave — загрузить сохранение (или просто отправь zip-файл)`)
+/uploadSave — загрузить сохранение через WebApp`)
 }
 
 // ── server status ─────────────────────────────────────────────────────────────
@@ -274,7 +274,44 @@ func (b *Bot) handleDownloadSave(chatID int64) {
 	b.replyDocument(chatID, name, data)
 }
 
-// ── upload save ───────────────────────────────────────────────────────────────
+// ── upload save command (/uploadSave) ─────────────────────────────────────────
+
+// handleUploadSaveCommand sends a WebApp button if WEBAPP_URL is configured,
+// otherwise falls back to a text instruction.
+func (b *Bot) handleUploadSaveCommand(chatID int64) {
+	if b.webAppURL == "" {
+		b.reply(chatID, "📤 Отправь zip-файл сохранения в этот чат.\n\n⚠️ Файлы >20 MB Telegram не пропустит. Настрой WEBAPP_URL для загрузки без ограничений.")
+		return
+	}
+
+	msg := tgbotapi.NewMessage(chatID, "📤 Открой загрузчик и выбери zip-файл сохранения:")
+	// tgbotapi v5.5.1 не имеет WebApp-конструктора — формируем JSON вручную через interface{}.
+	msg.ReplyMarkup = webAppKeyboard{
+		InlineKeyboard: [][]webAppBtn{{{
+			Text:   "📁 Загрузить сохранение",
+			WebApp: webAppInfo{URL: b.webAppURL},
+		}}},
+	}
+	if _, err := b.api.Send(msg); err != nil {
+		log.Printf("handleUploadSaveCommand send error: %v", err)
+	}
+}
+
+// webApp* — минимальные типы для Telegram WebApp-кнопки (Bot API 6.0+).
+// tgbotapi.MessageConfig.ReplyMarkup принимает interface{}, поэтому
+// любой тип, корректно маршалящийся в JSON, работает без обновления библиотеки.
+type webAppInfo struct {
+	URL string `json:"url"`
+}
+type webAppBtn struct {
+	Text   string     `json:"text"`
+	WebApp webAppInfo `json:"web_app"`
+}
+type webAppKeyboard struct {
+	InlineKeyboard [][]webAppBtn `json:"inline_keyboard"`
+}
+
+// ── upload save (document sent directly to chat) ──────────────────────────────
 
 func (b *Bot) handleUploadSave(chatID int64, doc *tgbotapi.Document) {
 	if !strings.HasSuffix(strings.ToLower(doc.FileName), ".zip") {

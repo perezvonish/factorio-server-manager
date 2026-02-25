@@ -29,7 +29,7 @@
   "autosave_only_on_server": true,
   "autosave_slots": 5,
   "description": "Description of the game that will appear in the listing",
-  "game_password": "g\u003cGo]X=Y\u0026wE(ggW]Oh7X0OvK",
+  "game_password": "aTTS%H+[(ki=dN$!_c[JUstE",
   "ignore_player_limit_for_returning_players": false,
   "max_heartbeats_per_second": 60,
   "max_players": 0,
@@ -44,7 +44,7 @@
   "non_blocking_saving": false,
   "only_admins_can_pause_the_game": true,
   "password": "",
-  "rcon_password": "g\u003cGo]X=Y\u0026wE(ggW]Oh7X0OvK",
+  "rcon_password": "aTTS%H+[(ki=dN$!_c[JUstE",
   "require_user_verification": true,
   "tags": [
     "game",

@@ -22,6 +22,7 @@ type Bot struct {
 	status       *status.Checker
 	passwords    *password.Manager
 	mods         *mods.Manager
+	webAppURL    string // публичный HTTPS-адрес WebApp для загрузки сейвов
 }
 
 // Config holds all dependencies needed to build a Bot
@@ -34,6 +35,7 @@ type Config struct {
 	Status       *status.Checker
 	PasswordMgr  *password.Manager
 	Mods         *mods.Manager
+	WebAppURL    string
 }
 
 func NewBot(cfg Config) (*Bot, error) {
@@ -51,6 +53,7 @@ func NewBot(cfg Config) (*Bot, error) {
 		status:       cfg.Status,
 		passwords:    cfg.PasswordMgr,
 		mods:         cfg.Mods,
+		webAppURL:    cfg.WebAppURL,
 	}, nil
 }
 

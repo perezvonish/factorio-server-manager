@@ -14,6 +14,7 @@ import (
 	"perezvonish/factorio-server-manager/internal/factorio/status"
 	"perezvonish/factorio-server-manager/internal/password"
 	"perezvonish/factorio-server-manager/internal/telegram"
+	"perezvonish/factorio-server-manager/internal/webapp"
 )
 
 func main() {
@@ -22,8 +23,10 @@ func main() {
 		log.Fatalf("config: %v", err)
 	}
 
+	allowedUsers := parseAllowedUsers(cfg.Telegram.AllowedUsers)
+
 	// Generate a fresh RCON password on every startup and persist it to disk.
-	// The Factorio container reads the rconpw file when it starts
+	// The Factorio container reads the rconpw file when it starts.
 	pwManager := password.NewManager(cfg.FactorioServer.RconPwFile)
 	if err := pwManager.Generate(24); err != nil {
 		log.Fatalf("password: %v", err)
@@ -50,15 +53,24 @@ func main() {
 		cfg.ModPortal.FactorioVersion,
 	)
 
+	// Start the save-upload WebApp HTTP server in the background.
+	webAppSrv := webapp.NewServer(cfg.Telegram.BotToken, allowedUsers, saveMgr)
+	go func() {
+		if err := webAppSrv.ListenAndServe(":" + cfg.WebApp.Port); err != nil {
+			log.Fatalf("webapp server: %v", err)
+		}
+	}()
+
 	bot, err := telegram.NewBot(telegram.Config{
 		Token:        cfg.Telegram.BotToken,
-		AllowedUsers: parseAllowedUsers(cfg.Telegram.AllowedUsers),
+		AllowedUsers: allowedUsers,
 		Rcon:         rcon,
 		Container:    dockerMgr,
 		Saves:        saveMgr,
 		Status:       statusChecker,
 		PasswordMgr:  pwManager,
 		Mods:         modsMgr,
+		WebAppURL:    cfg.WebApp.URL,
 	})
 	if err != nil {
 		log.Fatalf("telegram bot: %v", err)
